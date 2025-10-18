@@ -31,14 +31,76 @@ def add_task():
 	next_id += 1
 
 
+def view_tasks():
+	"""Display all tasks with index, title, due_date and status.
+
+	If no tasks exist, print a friendly message.
+	"""
+	if not tasks:
+		print("\nยังไม่มีงานในรายการ\n")
+		return
+
+	print("\n=== รายการงานทั้งหมด ===")
+	for i, t in enumerate(tasks, start=1):
+		status = "เสร็จแล้ว" if t.get("completed") else "ยังไม่เสร็จ"
+		title = t.get("title") or "(ไม่มีชื่อ)"
+		due = t.get("due_date") or "-"
+		print(f"{i}. {title}  | วันครบกำหนด: {due}  | {status}")
+	print("")
+
+
 def list_tasks():
 	"""List all tasks (empty stub)."""
-	pass
+	view_tasks()
+
+
+def update_task():
+	"""Update a task selected by index (0-based display to user as 1-based).
+
+	User can edit title, description, and completed status. Index is validated.
+	"""
+	global tasks
+
+	if not tasks:
+		print("\nยังไม่มีงานในรายการ\n")
+		return
+
+	view_tasks()
+
+	try:
+		idx_str = input("ป้อนลำดับงานที่ต้องการแก้ไข (ตัวเลข): ").strip()
+		idx = int(idx_str) - 1
+	except ValueError:
+		print("ตัวเลขไม่ถูกต้อง\n")
+		return
+
+	if idx < 0 or idx >= len(tasks):
+		print("ลำดับงานไม่ถูกต้อง\n")
+		return
+
+	task = tasks[idx]
+
+	print(f"\nแก้ไขงาน id={task['id']} (ปล่อยว่างเพื่อคงค่าเดิม)")
+	new_title = input(f"ชื่อเรื่อง [{task['title']}]: ").strip()
+	new_description = input(f"รายละเอียด [{task['description']}]: ").strip()
+	new_completed = input(f"สถานะเสร็จแล้ว? (y/N) [{'y' if task['completed'] else 'N'}]: ").strip().lower()
+
+	if new_title:
+		task['title'] = new_title
+	if new_description:
+		task['description'] = new_description
+	if new_completed in ('y', 'yes'):
+		task['completed'] = True
+	elif new_completed in ('n', 'no'):
+		task['completed'] = False
+
+	print("แก้ไขงานเรียบร้อย\n")
+
 
 
 def edit_task():
-	"""Edit an existing task (empty stub)."""
-	pass
+	"""Compatibility wrapper: call update_task()."""
+	update_task()
 
 
 def delete_task():
