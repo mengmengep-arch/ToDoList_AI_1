@@ -32,8 +32,16 @@ def add_task():
 
 
 def list_tasks():
-	"""List all tasks (empty stub)."""
-	pass
+	"""View all tasks: show index, title, due_date and status."""
+	if not tasks:
+		print("\nยังไม่มีงานในรายการ\n")
+		return
+
+	print("\n=== รายการงานทั้งหมด ===")
+	for idx, task in enumerate(tasks, start=1):
+		status = "เสร็จแล้ว" if task.get("completed") else "ยังไม่เสร็จ"
+		print(f"{idx}. {task.get('title')} | วันครบกำหนด: {task.get('due_date')} | สถานะ: {status}")
+	print()
 
 
 def edit_task():
