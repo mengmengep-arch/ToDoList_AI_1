@@ -1,4 +1,9 @@
 import sys
+import json
+import os
+
+# file to persist tasks
+TASKS_FILE = "tasks.json"
 
 # In-memory storage for tasks during runtime
 tasks = []
@@ -118,5 +123,56 @@ def main():
 			print("ตัวเลือกไม่ถูกต้อง กรุณาลองอีกครั้ง\n")
 
 
+def save_tasks():
+	"""Save `tasks` to TASKS_FILE as JSON."""
+	try:
+		with open(TASKS_FILE, 'w', encoding='utf-8') as f:
+			json.dump(tasks, f, ensure_ascii=False, indent=2)
+		print(f"บันทึกงานไปยัง {TASKS_FILE}")
+	except Exception as e:
+		print(f"ไม่สามารถบันทึกไฟล์ได้: {e}")
+
+
+def load_tasks():
+	"""Load tasks from TASKS_FILE if it exists, otherwise start empty.
+	Also sets `next_id` to max id + 1.
+	"""
+	global tasks, next_id
+	if not os.path.exists(TASKS_FILE):
+		# start with empty list
+		tasks = []
+		next_id = 1
+		return
+
+	try:
+		with open(TASKS_FILE, 'r', encoding='utf-8') as f:
+			data = json.load(f)
+			if isinstance(data, list):
+				tasks = data
+				# determine next_id
+				max_id = 0
+				for t in tasks:
+					try:
+						max_id = max(max_id, int(t.get('id', 0)))
+					except Exception:
+						pass
+				next_id = max_id + 1
+			else:
+				# invalid format, start fresh
+				tasks = []
+				next_id = 1
+		print(f"โหลดงานจาก {TASKS_FILE} (ทั้งหมด {len(tasks)} รายการ)")
+	except Exception as e:
+		print(f"ไม่สามารถโหลดไฟล์ได้, เริ่มจากรายการว่าง: {e}")
+		tasks = []
+		next_id = 1
+
+
 if __name__ == '__main__':
-	main()
+	# load tasks on startup
+	load_tasks()
+	try:
+		main()
+	finally:
+		# always save tasks before exit
+		save_tasks()
