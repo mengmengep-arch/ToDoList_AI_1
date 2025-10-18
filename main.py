@@ -42,8 +42,40 @@ def edit_task():
 
 
 def delete_task():
-	"""Delete a task (empty stub)."""
-	pass
+	"""Delete a task selected by index with confirmation.
+
+	Prompts the user for an index (1-based). Validates the index and asks
+	for confirmation before removing the task from `tasks`.
+	"""
+
+	if not tasks:
+		print("\nยังไม่มีงานในรายการ\n")
+		return
+
+	# show a brief list with indexes
+	print("\n=== รายการงาน ===")
+	for i, t in enumerate(tasks, start=1):
+		status = "เสร็จแล้ว" if t.get("completed") else "ยังไม่เสร็จ"
+		print(f"{i}. {t.get('title')}  -  {t.get('due_date')}  [{status}]")
+
+	try:
+		idx_str = input("เลือกงานที่ต้องการลบ (ลำดับ): ")
+		idx = int(idx_str)
+		if idx < 1 or idx > len(tasks):
+			print("Index ไม่ถูกต้อง\n")
+			return
+	except ValueError:
+		print("กรุณาใส่ตัวเลขที่ถูกต้อง\n")
+		return
+
+	task = tasks[idx - 1]
+	print(f"คุณเลือก: {task.get('title')} (ครบกำหนด: {task.get('due_date')})")
+	confirm = input("ต้องการลบงานนี้จริงหรือไม่ (y/n): ").strip().lower()
+	if confirm == 'y':
+		del tasks[idx - 1]
+		print("ลบงานเรียบร้อย\n")
+	else:
+		print("ยกเลิกการลบ\n")
 
 
 def show_menu():
